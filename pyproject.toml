@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "bills-service"
+version = "0.1.0"
+description = ""
+authors = ["sergey <sbitza@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+grpcio = "^1.69.0"
+grpcio-tools = "^1.69.0"
+environs = "^11.2.1"
+pdfplumber = "^0.11.5"
+pytesseract = "^0.3.13"
+pillow = "^11.1.0"
+requests = "^2.32.3"
+aiohttp = "^3.11.11"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
+asyncpg = "^0.30.0"
+alembic = "^1.14.0"
+psycopg2 = "^2.9.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

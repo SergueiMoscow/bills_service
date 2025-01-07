@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: bills-db
+    ports:
+      - "5437:5437"
+    command:
+      - "postgres"
+      - "-c"
+      - "port=5437"
+    env_file:
+      - .env
+    volumes:
+      - ${HOME}/databases/bills:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bills-net
+
+networks:
+  bills-net:
+    external: false

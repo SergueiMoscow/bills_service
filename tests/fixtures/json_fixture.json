@@ -1,0 +1,99 @@
+{
+    "code": 1,
+    "first": 1,
+    "data": {
+        "json": {
+            "messageFiscalSign": 9297127412983450000,
+            "code": 3,
+            "fiscalDocumentFormatVer": 4,
+            "fiscalDriveNumber": "7380440801185382",
+            "kktRegId": "0008070212010148    ",
+            "userInn": "7736207543  ",
+            "fiscalDocumentNumber": 169111,
+            "dateTime": "2025-01-04T19:31:00",
+            "fiscalSign": 3769337301,
+            "shiftNumber": 199,
+            "requestNumber": 165,
+            "operationType": 1,
+            "totalSum": 61900,
+            "internetSign": 1,
+            "appliedTaxationType": 1,
+            "cashTotalSum": 0,
+            "ecashTotalSum": 61900,
+            "prepaidSum": 0,
+            "creditSum": 0,
+            "provisionSum": 0,
+            "fnsUrl": "www.nalog.gov.ru",
+            "machineNumber": "whitespirit3f",
+            "user": "ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЯНДЕКС\"",
+            "retailPlaceAddress": "248926, Россия, Калужская обл., г. Калуга, проезд 1-й Автомобильный, дом 8",
+            "retailPlace": "market.yandex.ru",
+            "nds18": 0,
+            "nds10": 0,
+            "nds0": 0,
+            "ndsNo": 59900,
+            "nds18118": 333,
+            "nds10110": 0,
+            "buyerPhoneOrAddress": "sbitza@gmail.com",
+            "sellerAddress": "order@market.yandex.ru",
+            "properties": {
+                "propertyName": "psp_payment_id",
+                "propertyValue": "payment_d8b3d29cee3a4500ba0e6251e171653b|authorization_0000"
+            },
+            "propertiesData": "ws:CY7S26OAA2",
+            "items": [
+                {
+                    "labelCodeProcesMode": 0,
+                    "price": 59900,
+                    "quantity": 1,
+                    "sum": 59900,
+                    "nds": 6,
+                    "name": "Фасовочный пакет/ пакет майка / пакет 100 шт. 42х68 35мкм /Полиэтиленовый пакет со звездами / пакеты для арбузов, усиленные до 5",
+                    "paymentType": 1,
+                    "paymentAgentByProductType": 64,
+                    "providerInn": "504100088095",
+                    "itemsQuantityMeasure": 0,
+                    "productType": 1
+                },
+                {
+                    "labelCodeProcesMode": 0,
+                    "price": 2000,
+                    "quantity": 1,
+                    "sum": 2000,
+                    "nds": 3,
+                    "ndsSum": 333,
+                    "name": "Сервисный сбор",
+                    "paymentType": 1,
+                    "paymentAgentByProductType": 64,
+                    "providerInn": "9704254424  ",
+                    "itemsQuantityMeasure": 0,
+                    "productType": 1
+                }
+            ],
+            "region": "40",
+            "numberKkt": "00000003810518251287",
+            "redefine_mask": 0,
+            "metadata": {
+                "id": 5637283473845435000,
+                "ofdId": "ofd8",
+                "receiveDate": "2025-01-04T16:31:12Z",
+                "subtype": "receipt",
+                "address": "248926,Россия,Калужская область,Город Калуга г.о.,,Калуга город,,1-й Автомобильный проезд,,дом 8,,,,"
+            }
+        },
+        "html": "<table class=\"b-check_table table\"><tbody><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЯНДЕКС\"</td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">248926, Россия, Калужская обл., г. Калуга, проезд 1-й Автомобильный, дом 8</td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">ИНН 7736207543  </td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">&nbsp;</td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">04.01.2025 19:31</td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">Чек № 165</td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">Смена № 199</td></tr><tr class=\"b-check_vblock-middle b-check_center\"><td colspan=\"5\">Кассир </td></tr><tr class=\"b-check_vblock-last b-check_center\"><td colspan=\"5\">Приход</td></tr><tr><td><strong>№</strong></td><td><strong>Название</strong></td><td><strong>Цена</strong></td><td><strong>Кол.</strong></td><td><strong>Сумма</strong></td></tr><tr class=\"b-check_item\"><td>1</td><td>Фасовочный пакет/ пакет майка / пакет 100 шт. 42х68 35мкм /Полиэтиленовый пакет со звездами / пакеты для арбузов, усиленные до 5</td><td>599.00</td><td>1</td><td>599.00</td></tr><tr class=\"b-check_item\"><td>2</td><td>Сервисный сбор</td><td>20.00</td><td>1</td><td>20.00</td></tr><tr class=\"b-check_vblock-first\"><td colspan=\"3\" class=\"b-check_itogo\">ИТОГО:</td><td></td><td class=\"b-check_itogo\">619.00</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"3\">Наличные</td><td></td><td>0.00</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"3\">Карта</td><td></td><td>619.00</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"3\">НДС итога чека со ставкой 20%</td><td></td><td>0.00</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"3\">НДС итога чека со ставкой 10%</td><td></td><td>0.00</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"3\">НДС итога чека со ставкой 0%</td><td></td><td>0.00</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"3\">НДС не облагается</td><td></td><td>599.00</td></tr><tr class=\"b-check_vblock-last\"><td colspan=\"5\">ВИД НАЛОГООБЛОЖЕНИЯ: ОСН</td></tr><tr class=\"b-check_vblock-first\"><td colspan=\"5\">РЕГ.НОМЕР ККТ: 0008070212010148    </td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"5\">ЗАВОД. №: </td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"5\">ФН: 7380440801185382</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"5\">ФД: 169111</td></tr><tr class=\"b-check_vblock-middle\"><td colspan=\"5\">ФПД#: 3769337301</td></tr><tr class=\"b-check_vblock-last\"><td colspan=\"5\" class=\"b-check_center\"><img src=\"/qrcode/generate?text=t%3D20250104T1931%26s%3D619.00%26fn%3D7380440801185382%26i%3D169111%26fp%3D3769337301%26n%3D1\" alt=\"QR код чека\" width=\"35%\" loading=\"lazy\" decoding=\"async\"></td></tr></tbody></table>"
+    },
+    "request": {
+        "qrurl": "",
+        "qrfile": "",
+        "qrraw": "t=20250104t1931&s=619.00&fn=7380440801185382&i=169111&fp=3769337301&n=1",
+        "manual": {
+            "fn": "7380440801185382",
+            "fd": "169111",
+            "fp": "3769337301",
+            "check_time": "20250104t1931",
+            "type": "1",
+            "sum": "619"
+        }
+    }
+}
