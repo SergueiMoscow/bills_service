@@ -30,11 +30,22 @@ jobs:
         # check this thread to understand why its needed:
         # <https://stackoverflow.com/a/70447517>
         run: |
+          echo "Creating .ssh directory if it does not exist..."
           mkdir -p ~/.ssh
+          echo "Checking .ssh directory..."
+          ls -la ~/.ssh
+          
+          echo "Writing private key to ~/.ssh/id_rsa"
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} > ~/.ssh/known_hosts
-
+          
+          echo "Adding server to known hosts..."
+          if ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts; then
+            echo "Server added to known_hosts."
+          else
+            echo "Failed to add server to known_hosts."
+            exit 1
+          fi
       - name: Deploy to Server
 #        uses: D3rHase/ssh-command-action@v0.2.2
 #        with:
