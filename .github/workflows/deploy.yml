@@ -27,13 +27,14 @@ jobs:
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Deploy to Server
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
-        run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_PORT }} -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'ENDSSH'
-          cd ~/bills_service
-          git pull origin main
-          docker compose down
-          docker-compose --env-file .env up -d --build
-          docker compose exec bills poetry run alembic upgrade head
-          ENDSSH
+        uses: D3rHase/ssh-command-action@v0.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          user: ${{ secrets.SERVER_USER }}
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command: |
+            cd ~/bills_service;
+            git pull origin main;
+            docker compose down;
+            docker-compose --env-file .env up -d --build;
+            docker compose exec bills poetry run alembic upgrade head;
