@@ -171,3 +171,5 @@ cython_debug/
 .pypirc
 readme.sss
 uploaded_files/
+.env.deploy
+

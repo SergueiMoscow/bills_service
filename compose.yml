@@ -1,0 +1,48 @@
+services:
+  bills:
+    container_name: bills-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${GRPC_PORT}:50051"
+    volumes:
+      - ./:/app
+    environment:
+      DB_DSN: ${DB_DSN}
+    depends_on:
+      - db
+      - migrations
+    restart: always
+
+  db:
+    image: postgres:latest
+    container_name: bills-db
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    command:
+      - "postgres"
+      - "-c"
+      - "port=${DB_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - ${HOME}/databases/bills:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bills-net
+
+  migrations:
+    container_name: bills-migrations
+    build:
+      context: .
+    command: bash -c "while !</dev/tcp/db/${DB_PORT}; do sleep 1; done; alembic upgrade head"
+    restart: "no"
+    environment:
+      DB_DSN: ${DB_DSN}
+    depends_on:
+      - db
+
+networks:
+  bills-net:
+    external: false
