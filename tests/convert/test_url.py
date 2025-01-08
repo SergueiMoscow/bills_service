@@ -1,6 +1,6 @@
 import os
 
-from convert.url_convert import download_content_from_url
+from services.url_convert import download_content_from_url
 from settings import BASE_DIR
 
 

@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Double
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime, timezone
 
-Base = declarative_base()
+from db.db import Base
 
 
 class Cheque(Base):
@@ -12,7 +11,8 @@ class Cheque(Base):
     file_name = Column(String, nullable=True)  # Имя файла чека json
     purchase_date = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # Дата и время покупки
     user = Column(String, nullable=False)  # Отправитель
-    seller = Column(String, nullable=True)
+    seller = Column(String, nullable=False, default='')
+    account = Column(String, nullable=False, default='')
     total = Column(Double, nullable=False, default=0.0)
     notes = Column(String, nullable=False, default='')
     created_at = Column(DateTime, default=datetime.now())  # Дата создания

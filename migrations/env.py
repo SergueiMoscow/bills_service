@@ -1,12 +1,15 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool, text
+from sqlalchemy.sql.ddl import CreateSchema
 
 from alembic import context
+import settings
 
-from db.models import Base
-from settings import DATABASE_URI
+# add your model's MetaData object here
+# for 'autogenerate' support
+from db import models
+from db.db import db_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -17,18 +20,15 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+
+target_metadata = models.Base.metadata
+# target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config.set_main_option('sqlalchemy.url', DATABASE_URI)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -42,12 +42,13 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    # url = config.get_main_option("sqlalchemy.url")
+    url = db_url
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={'paramstyle': 'named'},
     )
 
     with context.begin_transaction():
@@ -61,16 +62,26 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # ssss
+    configuration = config.get_section(config.config_ini_section)
+    configuration['sqlalchemy.url'] = db_url
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+        # config.get_section(config.config_ini_section, {}),
+        configuration,
+        prefix='sqlalchemy.',
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
+        connection = connection.execution_options(
+            isolation_level='AUTOCOMMIT', schema_translate_map={None: settings.DATABASE_SCHEMA}
         )
+        if not connection.dialect.has_schema(connection, settings.DATABASE_SCHEMA):
+            connection.execute(CreateSchema(settings.DATABASE_SCHEMA))
+        connection.execute(text(f'SET search_path TO {settings.DATABASE_SCHEMA}'))
+
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

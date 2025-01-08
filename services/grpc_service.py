@@ -11,7 +11,7 @@ from settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
 
 class FileService(file_service_pb2_grpc.FileServiceServicer):
 
-    def UploadFile(
+    async def UploadFile(
         self,
         request,
         context,
@@ -29,8 +29,10 @@ class FileService(file_service_pb2_grpc.FileServiceServicer):
             f.write(request.file)
 
         # Обработка файла
-        asyncio.run(process_received_data(request, file_path))
-        # process_received_data(request)
+        # asyncio.run(process_received_data(request, file_path))
+        result = await process_received_data(request, file_path)
+
 
         print(f'Received {request.filename} / {request.description} from {request.username} ({request.user_id})')
-        return file_service_pb2.UploadFileResponse(message=f"Файл успешно загружен для пользователя {request.username}.")
+        # return file_service_pb2.UploadFileResponse(message=f"Файл успешно загружен для пользователя {request.username}.")
+        return file_service_pb2.UploadFileResponse(message=result)

@@ -1,5 +1,5 @@
-from convert.extract_data import ExtractData
-from convert.pdf_convert import extract_text_from_pdf
+from services.extract_data import ExtractData
+from services.pdf_convert import extract_text_from_pdf
 from tests.convert.test_pdf import PATH, EXT
 from utils.utils import get_files_by_extension
 

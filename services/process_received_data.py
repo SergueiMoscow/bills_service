@@ -1,16 +1,18 @@
-from convert.extract_data import ExtractData
-from convert.pdf_convert import extract_text_from_pdf
-from services.bill_service import get_cheque_from_api_service, save_cheque_from_json
-from settings import async_session
+from db.connector import AsyncSession
+from services.extract_data import ExtractData
+from services.pdf_convert import extract_text_from_pdf
+from services.cheque_api_service import get_cheque_from_api_service
+from repository.cheque_repository import save_cheque_from_json
 
 
-async def process_received_data(request, file_path) -> None:
+async def process_received_data(request, file_path) -> str:
 
-    async with async_session() as session:
+    async with AsyncSession() as session:
         if request.filename.endswith('.txt'):
             # Если это текстовый файл, получаем чек через API и сохраняем
-            qrraw = request.description  # Предположительно строка с параметрами чека
+            qrraw = request.description  # строка с параметрами чека
             json_data = await get_cheque_from_api_service(qrraw)
+            notes = qrraw  # текст - параметры запроса чека для API, пишем в notes
 
         elif request.filename.endswith('.pdf'):
             # Если это PDF, извлекаем текст
@@ -50,8 +52,15 @@ async def process_received_data(request, file_path) -> None:
                     }
                 }
             }
+            notes = file_path
         else:
             raise ValueError('Unknown file extension')
 
-        await save_cheque_from_json(session, json_data, request.filename, request.username)
+        result = await save_cheque_from_json(
+            session=session,
+            json_data=json_data,
+            file_name=notes,
+            user=request.username
+        )
         await session.commit()
+    return result

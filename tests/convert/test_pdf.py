@@ -3,7 +3,7 @@
 # PyPDF2
 import os
 
-from convert.pdf_convert import extract_text_from_pdf
+from services.pdf_convert import extract_text_from_pdf
 from utils.utils import get_files_by_extension
 PATH = '../pdf_fixtures'
 EXT = 'pdf'
