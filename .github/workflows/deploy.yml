@@ -26,24 +26,32 @@ jobs:
 #      - name: Prepare .env file
 #        run: echo "${{ secrets.ENV_FILE }}" > .env
 
-#      - name: install ssh keys
-#        # check this thread to understand why its needed:
-#        # <https://stackoverflow.com/a/70447517>
-#        run: |
-#          install -m 600 -D /dev/null ~/.ssh/id_rsa
-#          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-#          ssh-keyscan -H ${{ secrets.SERVER_IP }} > ~/.ssh/known_hosts
+      - name: install ssh keys
+        # check this thread to understand why its needed:
+        # <https://stackoverflow.com/a/70447517>
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} > ~/.ssh/known_hosts
 
       - name: Deploy to Server
-        uses: D3rHase/ssh-command-action@v0.2.2
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          port: ${{ secrets.SERVER_PORT}}
-          user: ${{ secrets.SERVER_USER }}
-          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          command: |
-            cd ~/bills_service;
-            git pull origin main;
-            docker compose down;
-            docker-compose --env-file .env up -d --build;
-            docker compose exec bills poetry run alembic upgrade head;
+#        uses: D3rHase/ssh-command-action@v0.2.2
+#        with:
+#          host: ${{ secrets.SERVER_IP }}
+#          port: ${{ secrets.SERVER_PORT}}
+#          user: ${{ secrets.SERVER_USER }}
+#          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          command: |
+#            cd ~/bills_service;
+#            git pull origin main;
+#            docker compose down;
+#            docker-compose --env-file .env up -d --build;
+#            docker compose exec bills poetry run alembic upgrade head;
+        run: |
+          ssh -i ~/.ssh/id_rsa -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd ~/bills_service
+          git pull origin main
+          docker-compose down
+          docker-compose --env-file .env up -d --build
+          docker-compose exec bills poetry run alembic upgrade head
+          EOF
