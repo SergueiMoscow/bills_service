@@ -1,6 +1,6 @@
 FROM python:3.12
 WORKDIR /app
-COPY pyproject.toml poetry.lock alembic.ini entrypoint.sh ./
+COPY pyproject.toml poetry.lock ./
 COPY db ./db
 COPY migrations ./migrations
 COPY repository ./repository
