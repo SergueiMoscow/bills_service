@@ -26,20 +26,21 @@ jobs:
 #      - name: Prepare .env file
 #        run: echo "${{ secrets.ENV_FILE }}" > .env
 
-      - name: Install OpenVPN
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openvpn
+#      - name: Install OpenVPN
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y openvpn
 
       - name: Create OVPN config file
         run: echo "${{ secrets.HOME_SERVER_OVPN }}" > config.ovpn
 
-      - name: Run OpenVPN
+      - name: Run OpenVPN Client
         run: |
           docker run --rm --cap-add=NET_ADMIN --device /dev/net/tun \
           -v ${{ github.workspace }}/config.ovpn:/etc/openvpn/config.ovpn \
-          kylemanna/openvpn \
-          ovpn_run /etc/openvpn/config.ovpn &
+          wfg/openvpn-client \
+          openvpn --config /etc/openvpn/config.ovpn
+          echo "Ждём 10 сек."
           sleep 10  # Дайте немного времени для подключения
 
       - name: install ssh keys
