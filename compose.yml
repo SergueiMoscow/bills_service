@@ -14,6 +14,8 @@ services:
       - db
       - migrations
     restart: always
+    networks:
+      - bills-net
 
   db:
     image: postgres:latest
@@ -36,12 +38,14 @@ services:
     container_name: bills-migrations
     build:
       context: .
-    command: bash -c "until pg_isready -h db -p ${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head"
+    command: bash -c "while !</dev/tcp/db:${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head"
     restart: "no"
     environment:
       DB_DSN: ${DB_DSN}
     depends_on:
       - db
+    networks:
+      - bills-net
 
 networks:
   bills-net:
