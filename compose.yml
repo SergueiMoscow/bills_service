@@ -19,11 +19,11 @@ services:
     image: postgres:latest
     container_name: bills-db
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     command:
       - "postgres"
       - "-c"
-      - "port=${DB_PORT}"
+      - "port=${POSTGRES_PORT}"
     env_file:
       - .env
     volumes:
