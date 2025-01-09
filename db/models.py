@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Double
 from datetime import datetime, timezone
 
+from sqlalchemy.orm import relationship
+
 from db.db import Base
 
 
@@ -22,6 +24,8 @@ class Cheque(Base):
         onupdate=datetime.now()
     )  # Дата обновления
 
+    details = relationship("ChequeDetail", back_populates="cheque")
+
 
 class ChequeDetail(Base):
     __tablename__ = 'cheque_details'
@@ -38,3 +42,5 @@ class ChequeDetail(Base):
         default=datetime.now(),
         onupdate=datetime.now()
     )  # Дата обновления
+
+    cheque = relationship("Cheque", back_populates="details")

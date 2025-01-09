@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from common import settings
+import settings
 
 SEARCH_PATH_PARAM_NAME = '-csearch_path%3D'
 

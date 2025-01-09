@@ -1,7 +1,7 @@
 import os
 
 from services.url_convert import download_content_from_url
-from common.settings import BASE_DIR
+from settings import BASE_DIR
 
 
 def test_download_content_from_url():

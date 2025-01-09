@@ -3,7 +3,7 @@ import os
 import file_service_pb2
 import file_service_pb2_grpc
 from services.process_received_data import process_received_data
-from common.settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
+from settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
 import logging
 
 logger = logging.getLogger(__name__)

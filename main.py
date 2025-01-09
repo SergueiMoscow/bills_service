@@ -6,7 +6,7 @@ import file_service_pb2_grpc
 from concurrent import futures
 
 from services.grpc_service import FileService
-from common.settings import GRPC_PORT
+from settings import GRPC_PORT
 from common.logger import setup_logging
 
 setup_logging()
@@ -22,7 +22,15 @@ async def serve():
     try:
         await server.wait_for_termination()
     except KeyboardInterrupt:
-        exit(0)
+        logger.info("gRPC сервер остановлен.")
+    except asyncio.exceptions.CancelledError:
+        logger.info("gRPC сервер остановлен.")
+    finally:
+        await server.stop(0)
+
 
 if __name__ == '__main__':
-    asyncio.run(serve())
+    try:
+        asyncio.run(serve())
+    except KeyboardInterrupt:
+        logger.info("Программа остановлена пользователем.")

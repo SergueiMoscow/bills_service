@@ -1,5 +1,5 @@
 import aiohttp
-from common.settings import PROVERKACHEKA_TOKEN, PROVERKACHEKA_URL
+from settings import PROVERKACHEKA_TOKEN, PROVERKACHEKA_URL
 import logging
 
 logger = logging.getLogger(__name__)
