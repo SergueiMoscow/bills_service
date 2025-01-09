@@ -1,0 +1,1 @@
+{'code': 3, 'data': 'Превышено количество обращений по чеку.', 'request': {'manual': {'check_time': '', 'fd': '', 'fn': '', 'fp': '', 'sum': '0', 'type': 1}, 'qrfile': '', 'qrraw': 'test file', 'qrurl': ''}}

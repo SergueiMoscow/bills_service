@@ -13,7 +13,10 @@ from services.grpc_service import FileService
 from settings import BASE_DIR
 from sqlalchemy import text as sa_text
 from alembic.config import Config
+from unittest import mock
 
+
+TESTS_DIR = os.path.dirname(__file__)
 
 @pytest.fixture
 def apply_migrations():
@@ -258,6 +261,24 @@ def cheque_creator(faker, cheque_detail_creator):
 
     return _create
 
+
 @pytest.fixture
-def created_cheque():
-    ...
+def mock_get_cheque_from_api_service_ok():
+    # Читаем содержимое файла-фикстуры
+    with open(os.path.join(TESTS_DIR, 'fixtures', 'json_fixture.json')) as f:
+        mock_response = json.load(f)
+
+    # Мокаем функцию get_cheque_from_api_service
+    with mock.patch('services.process_received_data.get_cheque_from_api_service', return_value=mock_response) as mocker:
+        yield mocker
+
+
+@pytest.fixture
+def mock_get_cheque_from_api_service_exceeded():
+    # Читаем содержимое файла-фикстуры
+    with open(os.path.join(TESTS_DIR, 'fixtures', 'json_exceeded.json')) as f:
+        mock_response = eval(f.read())
+
+    # Мокаем функцию get_cheque_from_api_service
+    with mock.patch('services.process_received_data.get_cheque_from_api_service', return_value=mock_response) as mocker:
+        yield mocker

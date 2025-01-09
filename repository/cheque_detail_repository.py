@@ -1,8 +1,7 @@
 from sqlalchemy.future import select
 from sqlalchemy import and_
-from sqlalchemy.orm import selectinload
-from datetime import datetime, timezone
-from typing import List, Optional, Tuple, Union
+from datetime import datetime
+from typing import List, Optional
 
 from db.connector import AsyncSession
 from db.models import ChequeDetail, Cheque
@@ -39,8 +38,6 @@ async def get_cheque_details(
     :param item_total_value: Значение для фильтрации по общей сумме товара
     :return: Список объектов ChequeDetail
     """
-
-    # Начинаем выборку деталей чеков
     query = select(ChequeDetail).join(Cheque)
 
     filters = []
@@ -52,7 +49,7 @@ async def get_cheque_details(
     if seller:
         filters.append(Cheque.seller == seller)
     if notes:
-        filters.append(Cheque.notes.ilike(f'%{notes}%'))  # Используем ilike для нечувствительного к регистру поиска
+        filters.append(Cheque.notes.ilike(f'%{notes}%'))
     if total_op and total_value is not None:
         total_operations = {
             '<': Cheque.total < total_value,
@@ -89,5 +86,4 @@ async def get_cheque_details(
     result = await session.execute(query)
     cheque_details = result.scalars().all()
 
-    # Возвращаем только объекты ChequeDetail
     return cheque_details
