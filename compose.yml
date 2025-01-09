@@ -38,7 +38,7 @@ services:
     container_name: bills-migrations
     build:
       context: .
-    command: bash -c "while !</dev/tcp/db:${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head"
+    command: bash -c "while !</dev/tcp/db/${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head"
     restart: "no"
     environment:
       DB_DSN: ${DB_DSN}
