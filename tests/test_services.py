@@ -1,9 +1,8 @@
-import pytest
 import os
 import file_service_pb2
 from unittest.mock import MagicMock
 
-from settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
+from common.settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 RECEIVED_FILES_PATH = os.path.abspath(RECEIVED_FILES_PATH)

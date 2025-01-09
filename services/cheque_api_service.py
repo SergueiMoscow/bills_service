@@ -1,7 +1,8 @@
 import aiohttp
+from common.settings import PROVERKACHEKA_TOKEN, PROVERKACHEKA_URL
+import logging
 
-from settings import PROVERKACHEKA_TOKEN, PROVERKACHEKA_URL
-
+logger = logging.getLogger(__name__)
 
 async def get_cheque_from_api_service(qrraw: str):
     data = {
@@ -15,5 +16,5 @@ async def get_cheque_from_api_service(qrraw: str):
                 return await response.json()
             else:
                 error_message = await response.text()
-                print(f"Error: {response.status}, Message: {error_message}")
+                logger.error(f"Error: {response.status}, Message: {error_message}")
                 return None

@@ -1,13 +1,12 @@
-import asyncio
 import os
-
-import grpc
 
 import file_service_pb2
 import file_service_pb2_grpc
 from services.process_received_data import process_received_data
-from settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
+from common.settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
+import logging
 
+logger = logging.getLogger(__name__)
 
 class FileService(file_service_pb2_grpc.FileServiceServicer):
 
@@ -18,7 +17,7 @@ class FileService(file_service_pb2_grpc.FileServiceServicer):
     ):
         # Проверяем токен
         if request.token != ACCESS_TOKEN:
-            print('Wrong token')
+            logger.error('Received wrong token')
             return None
 
         # Сохраняем файл
@@ -33,6 +32,6 @@ class FileService(file_service_pb2_grpc.FileServiceServicer):
         result = await process_received_data(request, file_path)
 
 
-        print(f'Received {request.filename} / {request.description} from {request.username} ({request.user_id})')
+        logger.info(f'Received {request.filename} / {request.description} from {request.username} ({request.user_id})')
         # return file_service_pb2.UploadFileResponse(message=f"Файл успешно загружен для пользователя {request.username}.")
         return file_service_pb2.UploadFileResponse(message=result)

@@ -1,7 +1,9 @@
 import os
-
 import requests
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 def download_content_from_url(url, save_as=None):
     """
@@ -22,13 +24,13 @@ def download_content_from_url(url, save_as=None):
             os.makedirs(os.path.dirname(save_as), exist_ok=True) if os.path.dirname(save_as) else None
             with open(save_as, 'wb') as file:
                 file.write(content)
-            print(f"Содержимое сохранено в файл: {save_as}")
+            logger.info(f"Содержимое сохранено в файл: {save_as}")
 
         return content
 
     except requests.exceptions.RequestException as e:
-        print(f"Ошибка при скачивании содержимого: {e}")
+        logger.error(f"Ошибка при скачивании содержимого: {e}")
         raise
     except IOError as e:
-        print(f"Ошибка при сохранении файла: {e}")
+        logger.error(f"Ошибка при сохранении файла: {e}")
         raise

@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config, pool, text
 from sqlalchemy.sql.ddl import CreateSchema
 
 from alembic import context
-import settings
+from common import settings
 
 # add your model's MetaData object here
 # for 'autogenerate' support

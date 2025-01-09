@@ -1,7 +1,9 @@
 import pdfplumber
 import os
 import pytesseract
+import logging
 
+logger = logging.getLogger(__name__)
 
 def extract_text_from_pdf(pdf_path, txt_path=None):
     """
@@ -29,14 +31,14 @@ def extract_text_from_pdf(pdf_path, txt_path=None):
                 if page_text:
                     extracted_text += page_text + "\n"
                 else:
-                    print(f"Предупреждение: Текст не найден на странице {page_number}.")
+                    logger.warning(f"Предупреждение: Текст не найден на странице {page_number}.")
     except Exception as e:
         raise RuntimeError(f"Ошибка при обработке PDF-файла: {e}")
 
     try:
         with open(txt_path, 'w', encoding='utf-8') as txt_file:
             txt_file.write(extracted_text)
-        print(f"Текст успешно сохранён в {txt_path}")
+        logger.info(f"Текст успешно сохранён в {txt_path}")
     except Exception as e:
         raise RuntimeError(f"Ошибка при сохранении текстового файла: {e}")
 
@@ -69,7 +71,7 @@ def extract_text_from_pdf_with_ocr(pdf_path, txt_path=None):
                     extracted_text += page_text + "\n"
                 else:
                     # Если на странице нет текста, попробуем извлечь изображение и применить OCR
-                    print(f"Текст не найден на странице {page_number}. Применение OCR...")
+                    logger.warning(f"Текст не найден на странице {page_number}. Применение OCR...")
                     im = page.to_image(resolution=300)
                     pil_image = im.original
                     ocr_text = pytesseract.image_to_string(pil_image, lang='rus')  # Укажите нужный язык
@@ -80,7 +82,7 @@ def extract_text_from_pdf_with_ocr(pdf_path, txt_path=None):
     try:
         with open(txt_path, 'w', encoding='utf-8') as txt_file:
             txt_file.write(extracted_text)
-        print(f"Текст успешно сохранён в {txt_path}")
+        logger.info(f"Текст успешно сохранён в {txt_path}")
     except Exception as e:
         raise RuntimeError(f"Ошибка при сохранении текстового файла: {e}")
 

@@ -6,10 +6,10 @@ import os
 
 from alembic import command
 
-import settings
+from common import settings
 from db.connector import Session
 from services.grpc_service import FileService
-from settings import BASE_DIR
+from common.settings import BASE_DIR
 from sqlalchemy import text as sa_text
 from alembic.config import Config
 
