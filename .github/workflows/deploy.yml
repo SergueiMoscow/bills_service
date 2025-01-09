@@ -12,36 +12,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12'
-
-#      - name: Install Poetry
-#        run: pip install poetry
-#
-#      - name: Install dependencies
-#        run: poetry install --no-root
-#
-#      - name: Prepare .env file
-#        run: echo "${{ secrets.ENV_FILE }}" > .env
-
-#      - name: Install OpenVPN
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y openvpn
-
-      - name: Create OVPN config file
-        run: echo "${{ secrets.HOME_SERVER_OVPN }}" > config.ovpn
-
-      - name: Run OpenVPN Client
+      - name: Set up OpenVPN
         run: |
-          docker run --rm --cap-add=NET_ADMIN --device /dev/net/tun \
-          -v ${{ github.workspace }}/config.ovpn:/etc/openvpn/config.ovpn \
-          yacht7/openvpn-client \
-          openvpn --config /etc/openvpn/config.ovpn
-          echo "Ждём 10 сек."
-          sleep 10  # Дайте немного времени для подключения
+          echo "${{ secrets.HOME_SERVER_OVPN }}" > home-server.ovpn
+          docker run --cap-add=NET_ADMIN --device /dev/net/tun --rm \
+            -v "$PWD:/mnt" \
+            -w /mnt \
+            --name openvpn \
+            dperson/openvpn-client \
+            -f home-server.ovpn
 
       - name: install ssh keys
         # check this thread to understand why its needed:
