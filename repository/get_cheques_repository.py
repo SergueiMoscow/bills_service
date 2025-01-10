@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List, Any
 
-from sqlalchemy import select, and_, BinaryExpression
+from sqlalchemy import select, and_, BinaryExpression, or_
 
 from db.connector import AsyncSession
 from db.models import Cheque
@@ -50,6 +50,16 @@ async def get_cheques(session: AsyncSession, filters: ChequeFilter) -> List[Cheq
     total_condition = get_comparison_operation(Cheque.total, filters.total_op, filters.total_value)
     if total_condition is not None:
         conditions.append(total_condition)
+    if filters.search:
+        search_pattern = f'%{filters.search}%'
+        search_conditions = or_(
+            Cheque.file_name.ilike(search_pattern),
+            Cheque.user.ilike(search_pattern),
+            Cheque.seller.ilike(search_pattern),
+            Cheque.account.ilike(search_pattern),
+            Cheque.notes.ilike(search_pattern),
+        )
+        conditions.append(search_conditions)
 
     if conditions:
         query = query.where(and_(*conditions))

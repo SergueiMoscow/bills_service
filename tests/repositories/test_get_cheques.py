@@ -13,36 +13,49 @@ from schemas.cheque_schemas import ChequeFilter
     "filter_data, expected_cheques_count",
     [
         # базовые тесты
-        ({
-            "start_date": datetime.now() - timedelta(days=1),
-            "end_date": datetime.now() + timedelta(days=1)
-        }, 1),
+        (ChequeFilter(
+            start_date=datetime.now() - timedelta(days=1),
+            end_date=datetime.now() + timedelta(days=1)
+        ), 1),
         # Ожидаем 1 чек с фильтром по продавцу
-        ({
-            "seller": "Some Seller"
-        }, 1),
+        (ChequeFilter(
+            seller="Some Seller"
+        ), 1),
         # Ожидаем 1 чек с суммой меньше 100
-        ({
-            "total_op": "<",
-            "total_value": 100.0
-        }, 1),
+        (ChequeFilter(
+            total_op="<",
+            total_value=100.0
+        ), 1),
         # Без фильтров, ожидаем 2 чека
-        ({}, 2),
+        (ChequeFilter(), 2),
         # Проверяем равно
-        ({
-            "total_op": "=",
-            "total_value": 180.0
-        }, 1),
+        (ChequeFilter(
+            total_op="=",
+            total_value=180.0
+        ), 1),
         # Поиск по заметкам
-        ({
-            "notes": "another"
-        }, 1),
+        (ChequeFilter(
+            notes="another"
+        ), 1),
         # Ничего не найдено
-        ({
-            "notes": "Non-existent note"
-        }, 0),
+        (ChequeFilter(
+            notes="Non-existent note"
+        ), 0),
         # Без фильтров, когда нет чеков
-        ({}, 2)
+        (ChequeFilter(), 2),
+        (ChequeFilter(
+            search="test"
+        ), 2),
+        (ChequeFilter(
+            search="Another"
+        ), 1),
+        (ChequeFilter(
+            search="ome Selle"
+        ), 1),
+        (ChequeFilter(
+            search="Non-existent search"
+        ), 0),
+
     ]
 )
 async def test_get_cheques(faker, cheque_creator, filter_data, expected_cheques_count):
@@ -62,10 +75,10 @@ async def test_get_cheques(faker, cheque_creator, filter_data, expected_cheques_
         commit=True
     )
 
-    filter_obj = ChequeFilter(**filter_data)
+    # filter_obj = ChequeFilter(**filter_data)
 
     async with AsyncSession() as session:
-        cheques = await get_cheques(session, filter_obj)
+        cheques = await get_cheques(session, filter_data)
 
     assert len(cheques) == expected_cheques_count
 
