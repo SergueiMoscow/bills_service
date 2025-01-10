@@ -10,7 +10,7 @@ class ChequeFilter(BaseModel):
     category: Optional[str] = Field(None, description="Категория для фильтрации")
     total_op: Optional[str] = Field(None, description="Операция для фильтрации по общей сумме")
     total_value: Optional[float] = Field(None, description="Значение для фильтрации по общей сумме")
-    search: Optional[str] = None  # Общий поиск по всем строковым полям
+    search: Optional[str] = Field(None, description="Общий поиск по всем строковым полям")
 
     @field_validator('total_op')
     def validate_total_op(cls, v):
