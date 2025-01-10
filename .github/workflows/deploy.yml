@@ -24,7 +24,6 @@ jobs:
           pwd
           git pull origin master
           docker compose --env-file .env up -d
-          EOF
 
 # Это пока убираем
 #          docker compose down
