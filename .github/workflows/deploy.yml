@@ -12,10 +12,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Prepare .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Configure Git Safe Directory
+        run: git config --global --add safe.directory /home/github/bills_service
+
       - name: Deploy to Server
         run: |
           pwd
-          ls -la .env
           git pull origin main
           docker compose down
           docker compose --env-file .env up -d --build
