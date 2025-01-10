@@ -5,7 +5,7 @@ from schemas.cheque_schemas import ChequeDetailsFilter
 from tests.conftest import cheque_detail_creator
 
 import pytest
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta
 
 
 @pytest.mark.usefixtures('apply_migrations')
@@ -90,7 +90,7 @@ async def test_check_fixtures(cheque_creator, cheque_detail_creator):
         ), 0),
     ]
 )
-async def test_get_cheque_details(faker, cheque_creator, cheque_detail_creator, filters, expected_items_found):
+async def test_get_cheque_details(cheque_creator, cheque_detail_creator, filters, expected_items_found):
     # Создание чека и деталей
     cheque = cheque_creator(
         purchase_date=datetime.now(),

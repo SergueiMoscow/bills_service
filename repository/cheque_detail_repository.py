@@ -1,7 +1,6 @@
 from sqlalchemy.future import select
 from sqlalchemy import and_, or_
-from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from db.connector import AsyncSession
 from db.models import ChequeDetail, Cheque

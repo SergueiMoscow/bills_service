@@ -1,3 +1,5 @@
+import sys
+
 import aiohttp
 from settings import PROVERKACHEKA_TOKEN, PROVERKACHEKA_URL
 import logging
@@ -11,6 +13,8 @@ async def get_cheque_from_api_service(qrraw: str):
     }
 
     async with aiohttp.ClientSession() as session:
+        if 'pytest' in sys.modules:
+            raise EnvironmentError('This function must be mocked for tests')
         async with session.post(PROVERKACHEKA_URL, json=data) as response:
             if response.status == 200:
                 return await response.json()

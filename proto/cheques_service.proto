@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package generated.cheques_service;
+
+import "google/protobuf/timestamp.proto";
+
+service ChequeService {
+   rpc GetCheques(GetChequesRequest) returns (GetChequesResponse);
+}
+
+// Сообщение фильтра для получения чеков
+message ChequeFilter {
+   google.protobuf.Timestamp start_date = 1; // Начальная дата для фильтрации по покупке
+   google.protobuf.Timestamp end_date = 2;   // Конечная дата для фильтрации по покупке
+   string seller = 3;       // Продавец для фильтрации
+   string notes = 4;        // Заметки для фильтрации
+   string category = 5;     // Категория для фильтрации
+   string total_op = 6;     // Операция для фильтрации по общей сумме
+   double total_value = 7;  // Значение для фильтрации по общей сумме
+   string search = 8;       // Общий поиск по всем строковым полям
+}
+
+// Сообщение для одного чека
+message Cheque {
+   int32 id = 1;
+   string file_name = 2;
+   google.protobuf.Timestamp purchase_date = 3;
+   string user = 4;
+   string seller = 5;
+   string account = 6;
+   double total = 7;
+   string notes = 8;
+   google.protobuf.Timestamp created_at = 9;
+   google.protobuf.Timestamp updated_at = 10;
+}
+
+// Запрос для получения чеков
+message GetChequesRequest {
+   ChequeFilter filter = 1;
+   string token = 2; // Для аутентификации, если требуется
+}
+
+// Ответ для получения чеков
+message GetChequesResponse {
+   repeated Cheque cheques = 1;
+}

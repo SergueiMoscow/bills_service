@@ -1,7 +1,8 @@
 import os
 
-import file_service_pb2
-import file_service_pb2_grpc
+import grpc
+
+from generated.file_service import file_service_pb2, file_service_pb2_grpc
 from services.process_received_data import process_received_data
 from settings import ACCESS_TOKEN, RECEIVED_FILES_PATH
 import logging
@@ -18,6 +19,8 @@ class FileService(file_service_pb2_grpc.FileServiceServicer):
         # Проверяем токен
         if request.token != ACCESS_TOKEN:
             logger.error('Received wrong token')
+            context.set_code(grpc.StatusCode.UNAUTHENTICATED)
+            context.set_details('Invalid token')
             return None
 
         # Сохраняем файл

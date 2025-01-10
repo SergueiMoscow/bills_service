@@ -9,7 +9,7 @@ from alembic import command
 import settings
 from db.connector import Session
 from db.models import ChequeDetail, Cheque
-from services.grpc_service import FileService
+from services.grpc.file_service import FileService
 from settings import BASE_DIR
 from sqlalchemy import text as sa_text
 from alembic.config import Config
