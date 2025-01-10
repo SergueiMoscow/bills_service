@@ -20,6 +20,7 @@ jobs:
 
       - name: Deploy to Server
         run: |
+          cd /home/github/bills_service
           pwd
           git pull origin main
           docker compose down
