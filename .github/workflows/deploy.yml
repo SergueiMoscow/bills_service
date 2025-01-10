@@ -15,8 +15,8 @@ jobs:
       - name: Deploy to Server
         run: |
           pwd
-          cd ~/bills_service
-          pwd
+#          cd ~/bills_service
+#          pwd
           ls -la .env
           git pull origin main
           docker compose down
