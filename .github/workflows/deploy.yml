@@ -22,7 +22,7 @@ jobs:
         run: |
           cd /home/github/bills_service
           pwd
-          git pull origin main
+          git pull origin master
           docker compose down
           docker compose --env-file .env up -d --build
           docker compose exec bills poetry run alembic upgrade head
