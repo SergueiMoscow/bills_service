@@ -40,7 +40,8 @@ services:
       context: .
     volumes:
       - ./:/app
-    command: bash -c "while !</dev/tcp/db/${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head; sleep 3600"
+#    command: bash -c "while !</dev/tcp/db/${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head; sleep 3600"
+    command: bash -c "while !</dev/tcp/db/${POSTGRES_PORT}; do sleep 1; done; alembic upgrade head"
     restart: "no"
     environment:
       DB_DSN: ${DB_DSN}
