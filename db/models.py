@@ -6,6 +6,8 @@ from sqlalchemy.orm import relationship
 from db.db import Base
 
 
+_CATEGORY_LENGTH = 20
+
 class Cheque(Base):
     __tablename__ = 'cheques'
 
@@ -36,6 +38,7 @@ class ChequeDetail(Base):
     price = Column(Float, nullable=False)  # Цена
     quantity = Column(Float, nullable=False, default=1.0)  # Количество
     total = Column(Float, nullable=False)  # Общая сумма
+    category = Column(String(_CATEGORY_LENGTH), nullable=False, default='')
     created_at = Column(DateTime, default=datetime.now())  # Дата создания
     updated_at = Column(
         DateTime,

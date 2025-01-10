@@ -5,56 +5,47 @@ from sqlalchemy import select, and_
 
 from db.connector import AsyncSession
 from db.models import Cheque
+from schemas.cheque_schemas import ChequeFilter
 
 
-async def get_cheques(
-    session: AsyncSession,
-    start_date: Optional[datetime] = None,
-    end_date: Optional[datetime] = None,
-    seller: Optional[str] = None,
-    notes: Optional[str] = None,
-    total_op: Optional[str] = None,
-    total_value: Optional[float] = None
-) -> List[Cheque]:
+async def get_cheques(session: AsyncSession, filters: ChequeFilter) -> List[Cheque]:
     """
     Получение чеков с учетом фильтров.
 
     :param session: Открытая сессия AsyncSession
-    :param start_date: Начальная дата для фильтрации по покупке
-    :param end_date: Конечная дата для фильтрации по покупке
-    :param seller: Продавец для фильтрации
-    :param notes: Заметки для фильтрации
-    :param total_op: Операция для фильтрации по общей сумме
-    :param total_value: Значение для фильтрации по общей сумме
+    :param filters: Объект ChequeFilter с фильтрами
     :return: Список объектов Cheque
     """
+    query = select(Cheque)
+    filter_conditions = []
 
-    query = select(Cheque)  # Начинаем с выборки чеков
-
-    filters = []
-
-    if start_date:
-        filters.append(Cheque.purchase_date >= start_date)
-    if end_date:
-        filters.append(Cheque.purchase_date <= end_date)
-    if seller:
-        filters.append(Cheque.seller == seller)
-    if notes:
-        filters.append(Cheque.notes.ilike(f'%{notes}%'))  # Нечувствительный к регистру поиск
-    if total_op and total_value is not None:
+    if filters.start_date:
+        filter_conditions.append(Cheque.purchase_date >= filters.start_date)
+    if filters.end_date:
+        filter_conditions.append(Cheque.purchase_date <= filters.end_date)
+    if filters.seller:
+        filter_conditions.append(Cheque.seller.ilike(f"%{filters.seller}%"))
+    if filters.category:
+        filter_conditions.append(Cheque.category.ilike(f"%{filters.category}%"))
+    if filters.notes:
+        filter_conditions.append(Cheque.notes.ilike(f"%{filters.notes}%"))
+    if filters.total_op and filters.total_value is not None:
         total_operations = {
-            '<': Cheque.total < total_value,
-            '<=': Cheque.total <= total_value,
-            '=': Cheque.total == total_value,
-            '>': Cheque.total > total_value,
-            '>=': Cheque.total >= total_value
+            '<': Cheque.total < filters.total_value,
+            '<=': Cheque.total <= filters.total_value,
+            '=': Cheque.total == filters.total_value,
+            '>': Cheque.total > filters.total_value,
+            '>=': Cheque.total >= filters.total_value
         }
-        filters.append(total_operations.get(total_op))
+        operation = total_operations.get(filters.total_op)
+        if operation is not None:
+            filter_conditions.append(operation)
 
-    if filters:
-        query = query.where(and_(*filters))
+    if filter_conditions:
+        query = query.where(and_(*filter_conditions))
+
+    # Добавляем сортировку по purchase_date в порядке возрастания
+    query = query.order_by(Cheque.purchase_date.asc())
 
     result = await session.execute(query)
-    cheques = result.scalars().all()
-
-    return cheques
+    return result.scalars().all()
