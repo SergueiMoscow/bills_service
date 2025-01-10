@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from db.connector import AsyncSession
 from db.models import ChequeDetail, Cheque
+from repository.get_cheques_repository import get_comparison_operation
 from schemas.cheque_schemas import ChequeDetailsFilter
 
 
@@ -24,35 +25,20 @@ async def get_cheque_details(
         conditions.append(Cheque.seller == filters.seller)
     if filters.notes:
         conditions.append(Cheque.notes.ilike(f'%{filters.notes}%'))
-    if filters.total_op and filters.total_value is not None:
-        total_operations = {
-            '<': Cheque.total < filters.total_value,
-            '<=': Cheque.total <= filters.total_value,
-            '=': Cheque.total == filters.total_value,
-            '>': Cheque.total > filters.total_value,
-            '>=': Cheque.total >= filters.total_value
-        }
-        conditions.append(total_operations.get(filters.total_op))
     if filters.item_name:
         conditions.append(ChequeDetail.name.ilike(f'%{filters.item_name}%'))
-    if filters.item_price_op and filters.item_price_value is not None:
-        price_operations = {
-            '<': ChequeDetail.price < filters.item_price_value,
-            '<=': ChequeDetail.price <= filters.item_price_value,
-            '=': ChequeDetail.price == filters.item_price_value,
-            '>': ChequeDetail.price > filters.item_price_value,
-            '>=': ChequeDetail.price >= filters.item_price_value
-        }
-        conditions.append(price_operations.get(filters.item_price_op))
-    if filters.item_total_op and filters.item_total_value is not None:
-        item_total_operations = {
-            '<': ChequeDetail.total < filters.item_total_value,
-            '<=': ChequeDetail.total <= filters.item_total_value,
-            '=': ChequeDetail.total == filters.item_total_value,
-            '>': ChequeDetail.total > filters.item_total_value,
-            '>=': ChequeDetail.total >= filters.item_total_value
-        }
-        conditions.append(item_total_operations.get(filters.item_total_op))
+
+    total_condition = get_comparison_operation(Cheque.total, filters.total_op, filters.total_value)
+    if total_condition is not None:
+        conditions.append(total_condition)
+
+    item_price_condition = get_comparison_operation(ChequeDetail.price, filters.item_price_op, filters.item_price_value)
+    if item_price_condition is not None:
+        conditions.append(item_price_condition)
+
+    item_total_condition = get_comparison_operation(ChequeDetail.total, filters.item_total_op, filters.item_total_value)
+    if item_total_condition is not None:
+        conditions.append(item_total_condition)
 
     # Общий поиск по строковым полям
     if filters.search:
