@@ -7,60 +7,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up OpenVPN
-        run: |
-          echo "${{ secrets.HOME_SERVER_OVPN }}" > home-server.ovpn
-          docker run --cap-add=NET_ADMIN --device /dev/net/tun --rm \
-            -v "$PWD:/mnt" \
-            -w /mnt \
-            --name openvpn \
-            dperson/openvpn-client \
-            -f home-server.ovpn
-
-      - name: install ssh keys
-        # check this thread to understand why its needed:
-        # <https://stackoverflow.com/a/70447517>
-        run: |
-          echo "Creating .ssh directory if it does not exist..."
-          mkdir -p ~/.ssh
-          echo "Checking .ssh directory..."
-          ls -la ~/.ssh
-          
-          echo "Writing private key to ~/.ssh/id_rsa"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          echo "Adding server to known hosts..."
-          if ssh-keyscan -p ${{secrets.SERVER_PORT}} -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts; then
-            echo "Server added to known_hosts."
-          else
-            echo "Failed to add server to known_hosts."
-            exit 1
-          fi
       - name: Deploy to Server
-#        uses: D3rHase/ssh-command-action@v0.2.2
-#        with:
-#          host: ${{ secrets.SERVER_IP }}
-#          port: ${{ secrets.SERVER_PORT}}
-#          user: ${{ secrets.SERVER_USER }}
-#          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          command: |
-#            cd ~/bills_service;
-#            git pull origin main;
-#            docker compose down;
-#            docker-compose --env-file .env up -d --build;
-#            docker compose exec bills poetry run alembic upgrade head;
         run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           pwd
           cd ~/bills_service
           pwd
-          echo "${{ secrets.ENV_FILE }}" > .env
           la -la .env
           git pull origin main
           docker compose down
