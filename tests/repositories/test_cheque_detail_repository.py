@@ -74,7 +74,20 @@ async def test_check_fixtures(cheque_creator, cheque_detail_creator):
             notes="Non-existent note",
         ), 0),  # Ничего не найдется
 
-        (ChequeDetailsFilter(), 2)  # никаких фильтров, ожидаем 2
+        (ChequeDetailsFilter(), 2),  # никаких фильтров, ожидаем 2
+        # Тесты для общего поиска
+        (ChequeDetailsFilter(
+            search="test"
+        ), 2),
+        (ChequeDetailsFilter(
+            search="Another"
+        ), 1),
+        (ChequeDetailsFilter(
+            search="Some Seller"
+        ), 2),
+        (ChequeDetailsFilter(
+            search="Non-existent search"
+        ), 0),
     ]
 )
 async def test_get_cheque_details(faker, cheque_creator, cheque_detail_creator, filters, expected_items_found):

@@ -1,5 +1,5 @@
 from sqlalchemy.future import select
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from datetime import datetime
 from typing import List, Optional
 
@@ -53,6 +53,20 @@ async def get_cheque_details(
             '>=': ChequeDetail.total >= filters.item_total_value
         }
         conditions.append(item_total_operations.get(filters.item_total_op))
+
+    # Общий поиск по строковым полям
+    if filters.search:
+        search_pattern = f'%{filters.search}%'
+        search_conditions = or_(
+            Cheque.file_name.ilike(search_pattern),
+            Cheque.user.ilike(search_pattern),
+            Cheque.seller.ilike(search_pattern),
+            Cheque.account.ilike(search_pattern),
+            Cheque.notes.ilike(search_pattern),
+            ChequeDetail.name.ilike(search_pattern),
+            ChequeDetail.category.ilike(search_pattern)
+        )
+        conditions.append(search_conditions)
 
     if conditions:
         query = query.where(and_(*conditions))

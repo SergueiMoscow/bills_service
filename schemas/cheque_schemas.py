@@ -35,3 +35,4 @@ class ChequeDetailsFilter(BaseModel):
     item_price_value: Optional[float] = None
     item_total_op: Optional[constr(pattern=r'^([<>])?=?$')] = None  # Операторы сравнения
     item_total_value: Optional[float] = None
+    search: Optional[str] = None  # Общий поиск по всем строковым полям
