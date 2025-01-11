@@ -9,12 +9,12 @@ from google.protobuf.internal.well_known_types import Timestamp
 from db.connector import AsyncSession
 from db.models import Cheque
 from generated.cheques_service import cheques_service_pb2_grpc, cheques_service_pb2
+from repository.cheque_detail_repository import get_cheque_details
 
 from repository.get_cheques_repository import get_cheques
-from schemas.cheque_schemas import ChequeFilter
+from schemas.cheque_schemas import ChequeFilter, ChequeDetailsFilter
 from settings import ACCESS_TOKEN
 from generated.cheques_service.cheques_service_pb2 import Cheque as ProtoCheque
-# from google.protobuf import timestamp_pb2
 
 
 logger = logging.getLogger(__name__)
@@ -55,6 +55,39 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             return cheques_service_pb2.GetChequesResponse()
 
         response = self._convert_cheques_to_response(cheques)
+        return response
+
+    async def GetChequeDetails(
+            self,
+            request,
+            context,
+    ):
+        self.request = request
+
+        if request.token != ACCESS_TOKEN:
+            logger.error('Received wrong token for GetChequeDetails')
+            context.set_code(grpc.StatusCode.UNAUTHENTICATED)
+            context.set_details('Invalid token')
+            return cheques_service_pb2.GetChequeDetailsResponse()
+
+        try:
+            filters = self._convert_request_to_details_filter()
+        except Exception as e:
+            logger.error(f'Error parsing details filters: {e}')
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details('Invalid filter parameters for details')
+            return cheques_service_pb2.GetChequeDetailsResponse()
+
+        try:
+            async with AsyncSession() as session:
+                cheque_details = await get_cheque_details(session, filters)
+        except Exception as e:
+            logger.error(f'Error fetching cheque details: {e}')
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details('Internal server error while fetching details')
+            return cheques_service_pb2.GetChequeDetailsResponse()
+
+        response = self._convert_cheque_details_to_response(cheque_details)
         return response
 
     def _proto_timestamp_to_datetime(self, proto_ts) -> Optional[datetime]:
@@ -103,3 +136,24 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             )
             response.cheques.append(proto_cheque)
         return response
+
+    def _convert_request_to_details_filter(self) -> ChequeDetailsFilter:
+        filter_pb = self.request.filter
+
+        start_date = self._proto_timestamp_to_datetime(filter_pb.start_date)
+        end_date = self._proto_timestamp_to_datetime(filter_pb.end_date)
+
+        return ChequeDetailsFilter(
+            start_date=start_date,
+            end_date=end_date,
+            seller=filter_pb.seller if filter_pb.seller else None,
+            notes=filter_pb.notes if filter_pb.notes else None,
+            total_op=filter_pb.total_op if filter_pb.total_op else None,
+            total_value=filter_pb.total_value if filter_pb.total_value else None,
+            item_name=filter_pb.item_name if hasattr(filter_pb, 'item_name') else None,
+            item_price_op=filter_pb.item_price_op if hasattr(filter_pb, 'item_price_op') else None,
+            item_price_value=filter_pb.item_price_value if hasattr(filter_pb, 'item_price_value') else None,
+            item_total_op=filter_pb.item_total_op if hasattr(filter_pb, 'item_total_op') else None,
+            item_total_value=filter_pb.item_total_value if hasattr(filter_pb, 'item_total_value') else None,
+            search=filter_pb.search if filter_pb.search else None,
+        )
