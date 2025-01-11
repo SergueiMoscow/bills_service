@@ -4,7 +4,7 @@ import pytest
 
 from db.connector import AsyncSession
 from repository.get_cheques_repository import get_cheques
-from schemas.cheque_schemas import ChequeFilter
+from schemas.cheque_schemas import ChequeFilterSchema
 
 
 @pytest.mark.usefixtures('apply_migrations')
@@ -13,46 +13,46 @@ from schemas.cheque_schemas import ChequeFilter
     "filter_data, expected_cheques_count",
     [
         # базовые тесты
-        (ChequeFilter(
+        (ChequeFilterSchema(
             start_date=datetime.now() - timedelta(days=1),
             end_date=datetime.now() + timedelta(days=1)
         ), 1),
         # Ожидаем 1 чек с фильтром по продавцу
-        (ChequeFilter(
+        (ChequeFilterSchema(
             seller="Some Seller"
         ), 1),
         # Ожидаем 1 чек с суммой меньше 100
-        (ChequeFilter(
+        (ChequeFilterSchema(
             total_op="<",
             total_value=100.0
         ), 1),
         # Без фильтров, ожидаем 2 чека
-        (ChequeFilter(), 2),
+        (ChequeFilterSchema(), 2),
         # Проверяем равно
-        (ChequeFilter(
+        (ChequeFilterSchema(
             total_op="=",
             total_value=180.0
         ), 1),
         # Поиск по заметкам
-        (ChequeFilter(
+        (ChequeFilterSchema(
             notes="another"
         ), 1),
         # Ничего не найдено
-        (ChequeFilter(
+        (ChequeFilterSchema(
             notes="Non-existent note"
         ), 0),
         # Без фильтров, когда нет чеков
-        (ChequeFilter(), 2),
-        (ChequeFilter(
+        (ChequeFilterSchema(), 2),
+        (ChequeFilterSchema(
             search="test"
         ), 2),
-        (ChequeFilter(
+        (ChequeFilterSchema(
             search="Another"
         ), 1),
-        (ChequeFilter(
+        (ChequeFilterSchema(
             search="ome Selle"
         ), 1),
-        (ChequeFilter(
+        (ChequeFilterSchema(
             search="Non-existent search"
         ), 0),
 
@@ -98,7 +98,7 @@ async def test_get_cheques_sorting(cheque_creator):
     cheque3 = cheque_creator(purchase_date=base_date + timedelta(days=3), commit=True)  # 4 января
 
     async with AsyncSession() as session:
-        cheques = await get_cheques(session, ChequeFilter())
+        cheques = await get_cheques(session, ChequeFilterSchema())
 
     purchase_dates = [cheque.purchase_date for cheque in cheques]
 

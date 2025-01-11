@@ -1,7 +1,7 @@
 from db.connector import AsyncSession
 from db.models import ChequeDetail, Cheque
 from repository.cheque_detail_repository import get_cheque_details
-from schemas.cheque_schemas import ChequeDetailsFilter
+from schemas.cheque_schemas import ChequeDetailsFilterSchema
 from tests.conftest import cheque_detail_creator
 
 import pytest
@@ -22,70 +22,70 @@ async def test_check_fixtures(cheque_creator, cheque_detail_creator):
 @pytest.mark.parametrize(
     "filters, expected_items_found",
     [
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             start_date=datetime.now() - timedelta(days=1),
             end_date=datetime.now() + timedelta(days=1),
         ), 2),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             start_date=datetime.now() - timedelta(days=1),
             seller="Some Seller",
         ), 2),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             total_op='<',
             total_value=200.0,
         ), 2),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             item_name="Test Item",
         ), 1),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             item_price_op='>',
             item_price_value=50.0,
         ), 1),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             item_price_op='<',
             item_price_value=25.0,
         ), 1),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             item_price_op='>=',
             item_price_value=20.0,
         ), 2),
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             total_op='>',
             total_value=200.0,
         ), 0),  # Проверка, что ничего нет
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             total_op='=',
             total_value=180.0,
         ), 2),  # Проверка на эквивалентность сумме
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             notes="test",
         ), 2),  # Поиск по заметкам
 
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             notes="Non-existent note",
         ), 0),  # Ничего не найдется
 
-        (ChequeDetailsFilter(), 2),  # никаких фильтров, ожидаем 2
+        (ChequeDetailsFilterSchema(), 2),  # никаких фильтров, ожидаем 2
         # Тесты для общего поиска
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             search="test"
         ), 2),
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             search="Another"
         ), 1),
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             search="Some Seller"
         ), 2),
-        (ChequeDetailsFilter(
+        (ChequeDetailsFilterSchema(
             search="Non-existent search"
         ), 0),
     ]

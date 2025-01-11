@@ -5,7 +5,7 @@ from sqlalchemy import select, and_, BinaryExpression, or_
 
 from db.connector import AsyncSession
 from db.models import Cheque
-from schemas.cheque_schemas import ChequeFilter
+from schemas.cheque_schemas import ChequeFilterSchema
 
 def get_comparison_operation(
     field: Any,
@@ -25,7 +25,7 @@ def get_comparison_operation(
     return operations.get(op)
 
 
-async def get_cheques(session: AsyncSession, filters: ChequeFilter) -> List[Cheque]:
+async def get_cheques(session: AsyncSession, filters: ChequeFilterSchema) -> List[Cheque]:
     """
     Получение чеков с учетом фильтров.
 

@@ -3,18 +3,20 @@ from typing import Optional, List
 from datetime import datetime
 
 import grpc
+import pydantic
 from google.protobuf import timestamp_pb2
 from google.protobuf.internal.well_known_types import Timestamp
 
 from db.connector import AsyncSession
-from db.models import Cheque
+from db.models import Cheque, ChequeDetail
 from generated.cheques_service import cheques_service_pb2_grpc, cheques_service_pb2
 from repository.cheque_detail_repository import get_cheque_details
 
 from repository.get_cheques_repository import get_cheques
-from schemas.cheque_schemas import ChequeFilter, ChequeDetailsFilter
+from schemas.cheque_schemas import ChequeFilterSchema, ChequeDetailsFilterSchema
 from settings import ACCESS_TOKEN
 from generated.cheques_service.cheques_service_pb2 import Cheque as ProtoCheque
+from generated.cheques_service.cheques_service_pb2 import ChequeDetail as ProtoChequeDetail
 
 
 logger = logging.getLogger(__name__)
@@ -72,6 +74,11 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
 
         try:
             filters = self._convert_request_to_details_filter()
+        except pydantic.ValidationError as e:
+            logger.error(f'Validation Error in filters: {e}')
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details('Invalid filter parameters for details')
+            return cheques_service_pb2.GetChequeDetailsResponse()
         except Exception as e:
             logger.error(f'Error parsing details filters: {e}')
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -95,13 +102,13 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             return None
         return proto_ts.ToDatetime()
 
-    def _convert_request_to_filter(self) -> ChequeFilter:
+    def _convert_request_to_filter(self) -> ChequeFilterSchema:
         filter_pb = self.request.filter
 
         start_date = self._proto_timestamp_to_datetime(filter_pb.start_date)
         end_date = self._proto_timestamp_to_datetime(filter_pb.end_date)
 
-        return ChequeFilter(
+        return ChequeFilterSchema(
             start_date=start_date,  # self._proto_timestamp_to_datetime(filter_pb.start_date),
             end_date=end_date,  # self._proto_timestamp_to_datetime(filter_pb.end_date),
             seller=filter_pb.seller if filter_pb.seller else None,
@@ -137,13 +144,13 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             response.cheques.append(proto_cheque)
         return response
 
-    def _convert_request_to_details_filter(self) -> ChequeDetailsFilter:
+    def _convert_request_to_details_filter(self) -> ChequeDetailsFilterSchema:
         filter_pb = self.request.filter
 
         start_date = self._proto_timestamp_to_datetime(filter_pb.start_date)
         end_date = self._proto_timestamp_to_datetime(filter_pb.end_date)
 
-        return ChequeDetailsFilter(
+        return ChequeDetailsFilterSchema(
             start_date=start_date,
             end_date=end_date,
             seller=filter_pb.seller if filter_pb.seller else None,
@@ -157,3 +164,46 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             item_total_value=filter_pb.item_total_value if hasattr(filter_pb, 'item_total_value') else None,
             search=filter_pb.search if filter_pb.search else None,
         )
+
+    def _convert_cheque_details_to_response(self, cheque_details: List[ChequeDetail]):
+        response = cheques_service_pb2.GetChequeDetailsResponse()
+        cheque_map = {}
+
+        for detail in cheque_details:
+            cheque = detail.cheque
+            if cheque.id not in cheque_map:
+                cheque_map[cheque.id] = {
+                    'cheque': ProtoCheque(
+                        id=cheque.id,
+                        file_name=cheque.file_name,
+                        purchase_date=self._datetime_to_proto_timestamp(cheque.purchase_date),
+                        user=cheque.user,
+                        seller=cheque.seller,
+                        account=cheque.account,
+                        total=cheque.total,
+                        notes=cheque.notes,
+                        created_at=self._datetime_to_proto_timestamp(cheque.created_at),
+                        updated_at=self._datetime_to_proto_timestamp(cheque.updated_at),
+                    ),
+                    'details': []
+                }
+
+            proto_detail = ProtoChequeDetail(
+                id=detail.id,
+                name=detail.name,
+                price=detail.price,
+                quantity=detail.quantity,
+                total=detail.total,
+                category=detail.category,
+                created_at=self._datetime_to_proto_timestamp(detail.created_at),
+                updated_at=self._datetime_to_proto_timestamp(detail.updated_at),
+            )
+            cheque_map[cheque.id]['details'].append(proto_detail)
+        for cheque_id, data in cheque_map.items():
+            cheque_with_details = cheques_service_pb2.GetChequeDetailsResponse.ChequeWithDetails(
+                cheque=data['cheque'],
+                details=data['details']
+            )
+            response.cheques_with_details.append(cheque_with_details)
+
+        return response

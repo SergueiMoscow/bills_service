@@ -1,4 +1,5 @@
 import json
+from unittest.mock import AsyncMock
 
 import pytest
 import tempfile
@@ -282,3 +283,9 @@ def mock_get_cheque_from_api_service_exceeded():
     # Мокаем функцию get_cheque_from_api_service
     with mock.patch('services.process_received_data.get_cheque_from_api_service', return_value=mock_response) as mocker:
         yield mocker
+
+
+@pytest.fixture
+def mock_services_grpc_cheque_services_get_cheque_details():
+    with mock.patch('services.grpc.cheques_service.get_cheque_details', new_callable=AsyncMock) as mock_get_cheque_details:
+        yield mock_get_cheque_details

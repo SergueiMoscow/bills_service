@@ -5,12 +5,12 @@ from typing import List
 from db.connector import AsyncSession
 from db.models import ChequeDetail, Cheque
 from repository.get_cheques_repository import get_comparison_operation
-from schemas.cheque_schemas import ChequeDetailsFilter
+from schemas.cheque_schemas import ChequeDetailsFilterSchema
 
 
 async def get_cheque_details(
     session: AsyncSession,
-    filters: ChequeDetailsFilter
+    filters: ChequeDetailsFilterSchema
 ) -> List[ChequeDetail]:
     query = select(ChequeDetail).join(Cheque)
 

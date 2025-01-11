@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 
-class ChequeFilter(BaseModel):
+class ChequeFilterSchema(BaseModel):
     start_date: Optional[datetime] = Field(None, description="Начальная дата для фильтрации по покупке")
     end_date: Optional[datetime] = Field(None, description="Конечная дата для фильтрации по покупке")
     seller: Optional[str] = Field(None, description="Продавец для фильтрации")
@@ -22,7 +22,7 @@ class ChequeFilter(BaseModel):
 
 
 
-class ChequeDetailsFilter(BaseModel):
+class ChequeDetailsFilterSchema(BaseModel):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     seller: Optional[str] = None
