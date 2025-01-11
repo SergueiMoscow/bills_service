@@ -15,8 +15,9 @@ from repository.cheque_detail_repository import get_cheque_details
 from repository.get_cheques_repository import get_cheques
 from schemas.cheque_schemas import ChequeFilterSchema, ChequeDetailsFilterSchema
 from settings import ACCESS_TOKEN
-from generated.cheques_service.cheques_service_pb2 import Cheque as ProtoCheque
-from generated.cheques_service.cheques_service_pb2 import ChequeDetail as ProtoChequeDetail
+# from generated.cheques_service.cheques_service_pb2 import Cheque as ProtoCheque
+# from generated.cheques_service.cheques_service_pb2 import ChequeDetail as ProtoChequeDetail
+import generated.cheques_service.cheques_service_pb2 as pb2
 
 
 logger = logging.getLogger(__name__)
@@ -85,16 +86,16 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             context.set_details('Invalid filter parameters for details')
             return cheques_service_pb2.GetChequeDetailsResponse()
 
-        try:
-            async with AsyncSession() as session:
+        async with AsyncSession() as session:
+            try:
                 cheque_details = await get_cheque_details(session, filters)
-        except Exception as e:
-            logger.error(f'Error fetching cheque details: {e}')
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details('Internal server error while fetching details')
-            return cheques_service_pb2.GetChequeDetailsResponse()
+            except Exception as e:
+                logger.error(f'Error fetching cheque details: {e}')
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details('Internal server error while fetching details')
+                return cheques_service_pb2.GetChequeDetailsResponse()
 
-        response = self._convert_cheque_details_to_response(cheque_details)
+            response = self._convert_cheque_details_to_response(cheque_details)
         return response
 
     def _proto_timestamp_to_datetime(self, proto_ts) -> Optional[datetime]:
@@ -129,7 +130,7 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
     def _convert_cheques_to_response(self, cheques: List[Cheque]):
         response = cheques_service_pb2.GetChequesResponse()
         for cheque in cheques:
-            proto_cheque = ProtoCheque(
+            proto_cheque = pb2.Cheque(
                 id=cheque.id,
                 file_name=cheque.file_name,
                 purchase_date=self._datetime_to_proto_timestamp(cheque.purchase_date),
@@ -173,7 +174,7 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             cheque = detail.cheque
             if cheque.id not in cheque_map:
                 cheque_map[cheque.id] = {
-                    'cheque': ProtoCheque(
+                    'cheque': pb2.Cheque(
                         id=cheque.id,
                         file_name=cheque.file_name,
                         purchase_date=self._datetime_to_proto_timestamp(cheque.purchase_date),
@@ -185,25 +186,23 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
                         created_at=self._datetime_to_proto_timestamp(cheque.created_at),
                         updated_at=self._datetime_to_proto_timestamp(cheque.updated_at),
                     ),
-                    'details': []
+                    'details': pb2.ChequeDetail(
+                        id=detail.id,
+                        name=detail.name,
+                        price=detail.price,
+                        quantity=detail.quantity,
+                        total=detail.total,
+                        category=detail.category,
+                        created_at=self._datetime_to_proto_timestamp(detail.created_at),
+                        updated_at=self._datetime_to_proto_timestamp(detail.updated_at),
+                    )
                 }
 
-            proto_detail = ProtoChequeDetail(
-                id=detail.id,
-                name=detail.name,
-                price=detail.price,
-                quantity=detail.quantity,
-                total=detail.total,
-                category=detail.category,
-                created_at=self._datetime_to_proto_timestamp(detail.created_at),
-                updated_at=self._datetime_to_proto_timestamp(detail.updated_at),
-            )
-            cheque_map[cheque.id]['details'].append(proto_detail)
         for cheque_id, data in cheque_map.items():
-            cheque_with_details = cheques_service_pb2.GetChequeDetailsResponse.ChequeWithDetails(
+            cheque_with_details = cheques_service_pb2.GetChequeDetailsResponse.ChequeDetailWithHead(
                 cheque=data['cheque'],
-                details=data['details']
+                detail=data['details']
             )
-            response.cheques_with_details.append(cheque_with_details)
+            response.detail_with_head.append(cheque_with_details)
 
         return response

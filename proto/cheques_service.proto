@@ -48,16 +48,6 @@ message ChequeDetail {
    google.protobuf.Timestamp updated_at = 8;
 }
 
-// Сообщение head чека
-message ChequeHead {
-    string id = 1; // Уникальный идентификатор чека
-    string store_location = 2; // Место совершения покупки
-    double total_amount = 3; // Общая сумма покупки
-    string seller = 4; // Продавец
-    string date = 5; // Дата покупки
-    // Другие необходимые поля
-}
-
 // Запрос для получения чеков
 message GetChequesRequest {
    ChequeFilter filter = 1;
@@ -99,7 +89,7 @@ message GetChequeDetailsResponse {
 
    // Описание детализированной информации каждой детали чека с ссылкой на головной чек
    message ChequeDetailWithHead {
-       ChequeHead head = 1; // Справочная информация о головном чеке
+       Cheque cheque = 1; // Справочная информация о головном чеке
        ChequeDetail detail = 2; // Деталь чека
    }
 }

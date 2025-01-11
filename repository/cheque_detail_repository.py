@@ -2,6 +2,8 @@ from sqlalchemy.future import select
 from sqlalchemy import and_, or_
 from typing import List
 
+from sqlalchemy.orm import selectinload
+
 from db.connector import AsyncSession
 from db.models import ChequeDetail, Cheque
 from repository.get_cheques_repository import get_comparison_operation
@@ -12,7 +14,8 @@ async def get_cheque_details(
     session: AsyncSession,
     filters: ChequeDetailsFilterSchema
 ) -> List[ChequeDetail]:
-    query = select(ChequeDetail).join(Cheque)
+    # query = select(ChequeDetail).join(Cheque)
+    query = select(ChequeDetail).join(Cheque).options(selectinload(ChequeDetail.cheque))
 
     conditions = []
 
@@ -61,5 +64,4 @@ async def get_cheque_details(
 
     result = await session.execute(query)
     cheque_details = result.scalars().all()
-
     return cheque_details
