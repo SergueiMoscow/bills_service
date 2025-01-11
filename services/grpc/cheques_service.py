@@ -3,6 +3,7 @@ from typing import Optional, List
 from datetime import datetime
 
 import grpc
+from google.protobuf import timestamp_pb2
 from google.protobuf.internal.well_known_types import Timestamp
 
 from db.connector import AsyncSession
@@ -12,6 +13,9 @@ from generated.cheques_service import cheques_service_pb2_grpc, cheques_service_
 from repository.get_cheques_repository import get_cheques
 from schemas.cheque_schemas import ChequeFilter
 from settings import ACCESS_TOKEN
+from generated.cheques_service.cheques_service_pb2 import Cheque as ProtoCheque
+# from google.protobuf import timestamp_pb2
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +24,7 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
     def __init__(self):
         self.request = None
 
-    async def get_cheques(
+    async def GetCheques(
         self,
         request,
         context,
@@ -42,7 +46,7 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
             return cheques_service_pb2.GetChequesResponse()
 
         try:
-            with AsyncSession() as session:
+            async with AsyncSession() as session:
                 cheques = await get_cheques(session, filters)
         except Exception as e:
             logger.error(f'Error fetching cheques: {e}')
@@ -61,9 +65,12 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
     def _convert_request_to_filter(self) -> ChequeFilter:
         filter_pb = self.request.filter
 
+        start_date = self._proto_timestamp_to_datetime(filter_pb.start_date)
+        end_date = self._proto_timestamp_to_datetime(filter_pb.end_date)
+
         return ChequeFilter(
-            start_date=self._proto_timestamp_to_datetime(filter_pb.start_date),
-            end_date=self._proto_timestamp_to_datetime(filter_pb.end_date),
+            start_date=start_date,  # self._proto_timestamp_to_datetime(filter_pb.start_date),
+            end_date=end_date,  # self._proto_timestamp_to_datetime(filter_pb.end_date),
             seller=filter_pb.seller if filter_pb.seller else None,
             notes=filter_pb.notes if filter_pb.notes else None,
             category=filter_pb.category if filter_pb.category else None,
@@ -75,14 +82,14 @@ class ChequesService(cheques_service_pb2_grpc.ChequeServiceServicer):
     def _datetime_to_proto_timestamp(self, dt: Optional[datetime]) -> Optional[Timestamp]:
         if dt is None:
             return None
-        timestamp = Timestamp()
+        timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(dt)
         return timestamp
 
     def _convert_cheques_to_response(self, cheques: List[Cheque]):
         response = cheques_service_pb2.GetChequesResponse()
         for cheque in cheques:
-            proto_cheque = cheques_service_pb2.ProtoCheque(
+            proto_cheque = ProtoCheque(
                 id=cheque.id,
                 file_name=cheque.file_name,
                 purchase_date=self._datetime_to_proto_timestamp(cheque.purchase_date),

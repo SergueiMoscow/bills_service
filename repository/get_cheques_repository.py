@@ -42,8 +42,6 @@ async def get_cheques(session: AsyncSession, filters: ChequeFilter) -> List[Cheq
         conditions.append(Cheque.purchase_date <= filters.end_date)
     if filters.seller:
         conditions.append(Cheque.seller.ilike(f"%{filters.seller}%"))
-    if filters.category:
-        conditions.append(Cheque.category.ilike(f"%{filters.category}%"))
     if filters.notes:
         conditions.append(Cheque.notes.ilike(f"%{filters.notes}%"))
 

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, validator, field_validator
+from pydantic import BaseModel, Field, validator, field_validator, constr
 from typing import Optional
 from datetime import datetime
+
 
 class ChequeFilter(BaseModel):
     start_date: Optional[datetime] = Field(None, description="Начальная дата для фильтрации по покупке")
@@ -20,9 +21,6 @@ class ChequeFilter(BaseModel):
         return v
 
 
-from pydantic import BaseModel, constr
-from typing import Optional
-from datetime import datetime
 
 class ChequeDetailsFilter(BaseModel):
     start_date: Optional[datetime] = None
