@@ -45,6 +45,7 @@ async def save_cheque_from_json(
         purchase_date=purchase_date,
         user=user,
         seller=data.get('user'),
+        account=data.get('account'),
         notes=data.get('retailPlace'),
         total=float(data.get('totalSum')) / 100,
         created_at=datetime.now(),  # В момент создания

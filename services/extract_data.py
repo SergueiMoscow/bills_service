@@ -168,38 +168,9 @@ class ExtractData:
         data['recipient_phone'] = self._extract_recipient_phone()
 
         # Номер телефона получателя
-        data['payment_account'] = self._extract_payment_account()
+        data['account'] = self._extract_payment_account()
 
         # Тип операции
         data['operation_type'] = self._extract_type_operation()
 
         return data
-
-
-def extract_info(text):
-    # Паттерны для регулярных выражений
-    patterns = {
-        "date": r"(\d{1,2} \w+ \d{4}|[0-9]{1,2} \d{1,2}:\d{1,2}:\d{1,2})",  # Даты
-        "recipient": r"ФИО\s+получателя.*?(\w.+)",  # Получатель
-        "amount": r"Сумма\s+операции.*?(\d[\d\s,.]*?)₽",  # Сумма
-        "commission": r"Комиссия.*?(\d[\d\s,.]*?)₽",  # Комиссия
-        "sender": r"ФИО\s+отправителя.*?(\w.+)",  # Отправитель
-        "phone": r"Номер телефона.*?(\+?\d[\d\s-]*)"  # Номер телефона
-    }
-
-    extracted_data = {}
-
-    # Ищем и заполняем данные
-    for key, pattern in patterns.items():
-        match = re.search(pattern, text, re.MULTILINE | re.IGNORECASE)
-        if match:
-            extracted_data[key] = match.group(1).strip()  # Сохраняем найденное значение
-
-    # Попробуйте преобразовать дату в формат datetime
-    if "date" in extracted_data:
-        try:
-            extracted_data["date"] = datetime.strptime(extracted_data["date"], "%d %B %Y")
-        except ValueError:
-            extracted_data["date"] = None  # Если не удалось распарсить дату
-
-    return extracted_data

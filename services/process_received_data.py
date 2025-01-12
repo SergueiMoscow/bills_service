@@ -62,6 +62,7 @@ async def process_received_data(request, file_path) -> str:
                         "dateTime": extracted_data['date'],
                         "user": extracted_data['recipient'],
                         "retailPlace": request.description,
+                        "account": extracted_data['account'],
                         "items": items  # Заполните, если есть информация о товарах
                     }
                 }
