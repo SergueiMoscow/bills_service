@@ -4,6 +4,9 @@ from db.connector import AsyncSession
 from db.models import Cheque, ChequeDetail
 from sqlalchemy.future import select
 
+from repository.apply_patterns import apply_patterns
+from repository.get_cheques_repository import get_cheque_by_id
+
 
 async def get_purchase_date_time_from_json_data(json_data: dict):
     """
@@ -71,8 +74,14 @@ async def save_cheque_from_json(
             updated_at=datetime.now()
         )
         session.add(cheque_detail)
-
     await session.flush()
+
+    # ПОСЛЕ добавления прогнать паттерны:
+    cheque = await get_cheque_by_id(session, cheque.id)
+    await apply_patterns(session, cheque)
+    for item in cheque.details:
+        await apply_patterns(session, item)
+
     return 'Cheque added to database'
 
 

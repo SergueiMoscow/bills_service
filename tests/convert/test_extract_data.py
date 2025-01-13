@@ -1,7 +1,9 @@
+import os
 from datetime import datetime
 
 from services.extract_data import ExtractData
 from services.pdf_convert import extract_text_from_pdf
+from settings import BASE_DIR
 from tests.convert.test_pdf import PATH, EXT
 from utils.utils import get_files_by_extension
 import logging
@@ -15,7 +17,7 @@ def test_extract_from_txt():
     Extracts from converted pdf->txt file
     :return:
     """
-    file = '../fixtures/sber_from_pdf.txt'
+    file = os.path.join(BASE_DIR, 'tests', 'fixtures', 'sber_from_pdf.txt')
     with open(file, 'r') as f:
         text = f.read()
     extracted_data = ExtractData(text).process()

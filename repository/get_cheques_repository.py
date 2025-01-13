@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, List, Any
 
 from sqlalchemy import select, and_, BinaryExpression, or_
+from sqlalchemy.orm import selectinload
 
 from db.connector import AsyncSession
 from db.models import Cheque
@@ -67,3 +68,12 @@ async def get_cheques(session: AsyncSession, filters: ChequeFilterSchema) -> Lis
 
     result = await session.execute(query)
     return result.scalars().all()
+
+
+async def get_cheque_by_id(session: AsyncSession, id: int) -> Optional[Cheque]:
+    stmt = (select(Cheque)
+            .options(selectinload(Cheque.details))
+            .where(Cheque.id == id))
+    result = await session.execute(stmt)
+    cheque = result.scalars().first()
+    return cheque

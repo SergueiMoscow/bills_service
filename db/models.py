@@ -38,7 +38,7 @@ class ChequeDetail(Base):
     price = Column(Float, nullable=False)  # Цена
     quantity = Column(Float, nullable=False, default=1.0)  # Количество
     total = Column(Float, nullable=False)  # Общая сумма
-    category = Column(String(_CATEGORY_LENGTH), nullable=False, default='')
+    category = Column(String(_CATEGORY_LENGTH), nullable=True, default='')
     created_at = Column(DateTime, default=datetime.now())  # Дата создания
     updated_at = Column(
         DateTime,
@@ -47,3 +47,21 @@ class ChequeDetail(Base):
     )  # Дата обновления
 
     cheque = relationship("Cheque", back_populates="details")
+
+
+# Модель Pattern - для заполнения пустых полей в зависимости от значений других полей
+class Pattern(Base):
+    __tablename__ = 'patterns'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    model_in = Column(String, nullable=False)  # Входная модель, например, 'Cheque'
+    field_in = Column(String, nullable=False)  # Входное поле, например, 'seller'
+    include = Column(String, nullable=False)  # Значение для поиска, например, 'ORGANIZATION'
+
+    model_out = Column(String, nullable=False)  # Выходная модель, например, 'ChequeDetail'
+    field_out = Column(String, nullable=False)  # Выходное поле, например, 'category'
+    value_out = Column(String, nullable=False)  # Значение для установки, например, 'Коммунальные услуги'
+
+    def __repr__(self):
+        return (f"<Pattern(id={self.id}, model='{self.model}', field_in='{self.field_in}', "
+                f"include='{self.include}', field_out='{self.field_out}', value='{self.value}')>")

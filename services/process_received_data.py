@@ -34,7 +34,7 @@ async def process_received_data(request, file_path) -> str:
 
             # Обработка извлеченного текста
             extractor = ExtractData(extracted_text)
-            extracted_data = extractor.process()  # Предполагаем, что метод process возвращает нужные данные
+            extracted_data = extractor.process()
 
             items = [{
                 "name": extracted_data['operation_type'],
@@ -56,14 +56,14 @@ async def process_received_data(request, file_path) -> str:
             json_data = {
                 "data": {
                     "json": {
-                        "code": 1,  # Добавьте остальные необходимые ключи, если нужно
+                        "code": 1,
                         "operationType": extracted_data['operation_type'],
                         "totalSum": extracted_data['amount'] * 100,
                         "dateTime": extracted_data['date'],
                         "user": extracted_data['recipient'],
                         "retailPlace": request.description,
                         "account": extracted_data['account'],
-                        "items": items  # Заполните, если есть информация о товарах
+                        "items": items
                     }
                 }
             }
