@@ -37,16 +37,32 @@ class ExtractData:
         return None
 
     def _extract_date(self) -> Optional[datetime]:
-        date_pattern = r'(\d{1,2}) (\w+) (\d{4})'
-        match = re.search(date_pattern, self.raw_text)
-        if match:
-            day, month_ru, year = match.groups()
-            month = self.MONTHS_RU.get(month_ru.lower())
-            if month:
-                try:
-                    return datetime(int(year), month, int(day))
-                except ValueError:
-                    return None
+        date_time_patterns = [
+            r'(\d{1,2}) (\w+) (\d{4}) в (\d{1,2}):(\d{2})'
+        ]
+        for date_time_pattern in date_time_patterns:
+            matches = re.findall(date_time_pattern, self.raw_text)
+            if matches:
+                day, month_ru, year, hour, minutes = matches[-1]
+                month = self.MONTHS_RU.get(month_ru.lower())
+                if month:
+                    try:
+                        return datetime(int(year), month, int(day), int(hour), int(minutes))
+                    except ValueError:
+                        return None
+        date_patterns = [
+            r'(\d{1,2}) (\w+) (\d{4})',
+        ]
+        for date_pattern in date_patterns:
+            matches = re.findall(date_pattern, self.raw_text)
+            if matches:
+                day, month_ru, year = matches[-1]
+                month = self.MONTHS_RU.get(month_ru.lower())
+                if month:
+                    try:
+                        return datetime(int(year), month, int(day))
+                    except ValueError:
+                        return None
         return None
 
     def _extract_commission(self) -> float:
@@ -152,7 +168,11 @@ class ExtractData:
 
         # Дата
         extracted_date = self._extract_date()
-        data['date'] = extracted_date.strftime('%Y-%m-%d') if extracted_date else None
+        if extracted_date:
+            format_str = '%Y-%m-%d %H:%M' if extracted_date.hour or extracted_date.minute else '%Y-%m-%d'
+            data['date'] = extracted_date.strftime(format_str)
+        else:
+            data['date'] = None
 
         # Получатель
         data['recipient'] = self._extract_recipient()

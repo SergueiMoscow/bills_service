@@ -108,3 +108,39 @@ async def test_get_cheques_sorting(cheque_creator):
     assert cheques[0].purchase_date == cheque2.purchase_date, "Первый чек должен иметь самую раннюю дату покупки"
     assert cheques[1].purchase_date == cheque1.purchase_date, "Второй чек должен иметь среднюю дату покупки"
     assert cheques[2].purchase_date == cheque3.purchase_date, "Третий чек должен иметь самую позднюю дату покупки"
+
+
+@pytest.mark.parametrize(
+    "filter_data, expected_cheques_count",
+    [
+        # базовые тесты
+        (ChequeFilterSchema(
+            start_date=datetime.now() - timedelta(days=5),
+            end_date=datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+        ), 2),
+    ]
+)
+@pytest.mark.usefixtures('apply_migrations')
+@pytest.mark.asyncio
+async def test_get_cheques_date_today(cheque_creator, filter_data, expected_cheques_count):
+    cheque_creator(
+        purchase_date=datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+        seller="Some Seller",
+        notes="This is a test",
+        total=180,
+        commit=True
+    )
+    cheque_creator(
+        purchase_date=datetime.now() - timedelta(days=5),
+        seller="Other Seller",
+        notes="Another test",
+        total=50,
+        commit=True
+    )
+
+    # filter_obj = ChequeFilter(**filter_data)
+
+    async with AsyncSession() as session:
+        cheques = await get_cheques(session, filter_data)
+
+    assert len(cheques) == expected_cheques_count
