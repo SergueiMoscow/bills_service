@@ -24,7 +24,8 @@ class ExtractData:
     def _extract_amount(self)-> float | None:
         patterns = [
             r'Сумма в валюте операции²\s*\n\s*[\d\s.,]+₽\s+([\d\s.,]+₽)',
-            r'Сумма (?:операции|перевода|платежа)\s+([\d\s.,]+₽)'
+            r'Сумма (?:операции|перевода|платежа)\s+([\d\s.,]+₽)',
+            r'Сумма ([\d\s.,]+i)'
         ]
         for pattern in patterns:
             match = re.search(pattern, self.raw_text, re.MULTILINE)
@@ -32,12 +33,14 @@ class ExtractData:
                 # Извлекаем найденную сумму
                 amount = match.group(1)
                 # Очищаем сумму от пробелов и символа ₽
-                amount_clean = amount.replace('₽', '').replace(' ', '').replace(',', '.')
+                # amount_clean = amount.replace('₽', '').replace(' ', '').replace(',', '.')
+                amount_clean = re.sub(r'[₽i\s]', '', amount)
                 return float(amount_clean)
         return None
 
     def _extract_date(self) -> Optional[datetime]:
         date_time_patterns = [
+            # 1 января 2005 в 01:01
             r'(\d{1,2}) (\w+) (\d{4}) в (\d{1,2}):(\d{2})'
         ]
         for date_time_pattern in date_time_patterns:
@@ -50,6 +53,20 @@ class ExtractData:
                         return datetime(int(year), month, int(day), int(hour), int(minutes))
                     except ValueError:
                         return None
+
+        date_time_patterns = [
+            # 01.01.2005 01:01:01
+            r'(\d{1,2}).(\d{1,2}).(\d{4}) (\d{1,2}):(\d{2}):(\d{2})'
+        ]
+        for date_time_pattern in date_time_patterns:
+            matches = re.findall(date_time_pattern, self.raw_text)
+            if matches:
+                day, month, year, hour, minutes, seconds = matches[-1]
+                try:
+                    return datetime(int(year), int(month), int(day), int(hour), int(minutes), int(seconds))
+                except ValueError:
+                    return None
+
         date_patterns = [
             r'(\d{1,2}) (\w+) (\d{4})',
         ]
