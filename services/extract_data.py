@@ -178,7 +178,7 @@ class ExtractData:
             if match:
                 operation_type = match.group(1).strip().split('\n')[0]
                 return operation_type
-        return None
+        return ''
 
     def process(self):
         data = {}
