@@ -172,4 +172,4 @@ cython_debug/
 readme.sss
 uploaded_files/
 .env.deploy
-
+deploy_old.yml
