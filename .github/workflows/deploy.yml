@@ -3,7 +3,7 @@ name: Trigger Jenkins Pipeline
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   trigger-jenkins:
