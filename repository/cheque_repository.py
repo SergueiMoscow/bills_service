@@ -67,9 +67,9 @@ async def save_cheque_from_json(
         cheque_detail = ChequeDetail(
             cheque_id=cheque_id,
             name=item.get("name"),  # Наименование товара
-            price=item.get("price"),  # Цена
+            price=float(item.get("price")) / 100,  # Цена
             quantity=item.get("quantity", 1.0),  # Количество
-            total=item.get("sum"),  # Общая сумма
+            total=float(item.get("sum")) / 100,  # Общая сумма
             created_at=datetime.now(),
             updated_at=datetime.now()
         )

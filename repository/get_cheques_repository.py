@@ -70,10 +70,10 @@ async def get_cheques(session: AsyncSession, filters: ChequeFilterSchema) -> Lis
     return result.scalars().all()
 
 
-async def get_cheque_by_id(session: AsyncSession, id: int) -> Optional[Cheque]:
+async def get_cheque_by_id(session: AsyncSession, cheque_id: int) -> Optional[Cheque]:
     stmt = (select(Cheque)
             .options(selectinload(Cheque.details))
-            .where(Cheque.id == id))
+            .where(Cheque.id == cheque_id))
     result = await session.execute(stmt)
     cheque = result.scalars().first()
     return cheque
